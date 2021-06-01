@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        {% load static %}
+
+        <style>
+            p{
+                /* font-weight: 500; */
+                font-size: 20px;
+                margin: 0px !important;
+            }
+            .center {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                width: 50%;
+                }
+            table, th, td {
+              border: 1px solid black;
+              border-collapse: collapse;
+            }
+        </style>
+    </head>
+  <body style="padding: 20px; background-color: #ffffff;">
+    <center>
+        <!-- <img src="https://spendthebits.com/wp-content/uploads/2020/06/stb-logo.png" style="width:100px"  alt=" " class="center"> -->
+         <img src="https://spendthebits.com/wp-content/uploads/2020/12/logo-stb.png" style="width:100px"  alt=" " class="center">
+<!-- <h3 style="font-family: Arial, Helvetica, sans-serif;">SPEND THE BITS</h3><br/>
+     <p style="font-family: Arial, Helvetica, sans-serif;font-size: 15px;font-weight: 100;">Your email has been succesfully verified. <br/>Please continue in the app.</p>
+    <br> -->
+</center>
+
+<br>
+<div>
+
+  <div>
+    <p><b>STB Wallet Transactions:</b></p>
+    {% if no_stb_transaction %}
+      <label>No STB wallet transactions available</label>
+    {% else %}
+      <table>
+          
+        <thead>
+          <tr >
+            <th>
+              <div class=”text”>
+                <h5>Sender</h5>
+              </div>
+            </th>
+            <th>
+              <div class=”text”>
+                <h5>Receiver</h5>
+              </div>
+            </th>
+            <th>
+                <div class=”text”>
+                  <h5>Value</h5>
+                </div>
+            </th>
+            <th>
+                <div class=”text”>
+                    <h5>Value in Cad</h5>
+                </div>
+            </th>
+
+            <th>
+                <div class=”text”>
+                    <h5>Transaction Type</h5>
+                </div>
+            </th>
+            <th>
+              <div class=”text”>
+                  <h5>Transaction Status</h5>
+              </div>
+          </th>
+            
+          <th>
+            <div class=”text”>
+                <h5>Date & Time</h5>
+            </div>
+        </th>
+          </tr>
+        </thead>
+      <tbody>
+        {% for row in stb_transaction %}
+          <tr>
+            <td> {{ row.sender }}</td>
+            <td> {{ row.receiver }} </td>
+            <td> {{ row.value }} </td>
+            <td> {{ row.value_in_cad }} </td>
+            <td> {{ row.transaction_type }} </td>
+            <td> {{ row.status }} </td>
+            <td> {{ row.created_date }} </td>            
+          </tr>
+        {% endfor %}
+      </tbody>
+      
+    </table>
+{% endif %}
+
+</div>
+ 
+
+<div>
+  <p><b>Fund Transactions:</b></p>
+  {% if no_fund_transaction %}
+
+  <label>No Fund transactions available</label>
+ {% else %}
+
+      <table>
+          
+      <thead>
+        <tr >
+          <th>
+            <div class=”text”>
+              <h5>Sender</h5>
+            </div>
+          </th>
+          
+          <th>
+              <div class=”text”>
+                <h5>Value</h5>
+              </div>
+          </th>
+          <th>
+              <div class=”text”>
+                  <h5>Value in Cad</h5>
+              </div>
+          </th>
+
+          <th>
+              <div class=”text”>
+                  <h5>Transaction Status</h5>
+              </div>
+          </th>
+          <th>
+            <div class=”text”>
+                <h5>Date & Time</h5>
+            </div>
+        </th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in fund_transaction %}
+          <tr>
+            <td> {{ row.user }}</td>
+            <td> {{ row.value }} </td>
+            <td> {{ row.value_in_cad }} </td>
+            <td> {{ row.status }} </td>
+            <td> {{ row.created_date }} </td>
+
+            
+          </tr>
+        {% endfor %}
+      </tbody>
+      
+    </table>
+  {% endif %}
+  </div>
+
+  <div>
+    <p><b>Withdrawal Transactions:</b></p>
+    {% if no_withdrawal_transaction %}
+      <label>No Withdrawal transactions available</label>
+    {% else %}
+      <table>
+          
+        <thead>
+          <tr >
+            <th>
+              <div class=”text”>
+                <h5>Sender</h5>
+              </div>
+            </th>
+            <th>
+              <div class=”text”>
+                <h5>Receiving address </h5>
+              </div>
+            </th>
+            <th>
+                <div class=”text”>
+                  <h5>Value in btc</h5>
+                </div>
+            </th>
+            <th>
+                <div class=”text”>
+                    <h5>Value in Cad</h5>
+                </div>
+            </th>
+            <th>
+              <div class=”text”>
+                  <h5>Transaction Status</h5>
+              </div>
+          </th>
+          <th>
+            <div class=”text”>
+                <h5>Date & Time</h5>
+            </div>
+        </th>
+          </tr>
+        </thead>
+      <tbody>
+        {% for row in withdrawal_transaction %}
+          <tr>
+            <td> {{ row.sender }}</td>
+            <td> {{ row.receiving_address }} </td>
+            <td> {{ row.value_in_btc }} </td>
+            <td> {{ row.value_in_cad }} </td>
+            <td> {{ row.status }} </td>
+            <td> {{ row.created_date }} </td>            
+          </tr>
+        {% endfor %}
+      </tbody>
+      
+    </table>
+{% endif %}
+
+</div>
+
+
+<!-- <div>
+  <p><b>Bitcoin network ledger:</b></p>
+  {% if no_bitcoin_ledger %}
+    <label>No transactions available</label>
+  {% else %}
+    <table id="result_list">
+        
+      <thead>
+        <tr >
+          <th>
+            <div class=”text”>
+              <h5>sender_user</h5>
+            </div>
+          </th>
+          <th>
+            <div class=”text”>
+              <h5>receiver_user</h5>
+            </div>
+          </th>
+          <th>
+              <div class=”text”>
+                <h5>Amount</h5>
+              </div>
+          </th>
+          <th>
+              <div class=”text”>
+                  <h5>Reference No</h5>
+              </div>
+          </th>
+
+          <th>
+              <div class=”text”>
+                  <h5>Notes</h5>
+              </div>
+          </th>
+          <th>
+            <div class=”text”>
+                <h5>Created Date</h5>
+            </div>
+        </th>
+          
+        </tr>
+      </thead>
+    <tbody>
+      {% for row in current_bitcoint_ledger %}
+        <tr>
+          <td> {{ row.sender_user }}</td>
+          <td> {{ row.receiver_user }} </td>
+          <td> {{ row.amount }} </td>
+          <td> {{ row.reference_number }} </td>
+          <td> {{ row.notes }} </td>
+          <td> {{ row.created_date }} </td>            
+        </tr>
+      {% endfor %}
+    </tbody>
+    
+  </table>
+{% endif %}
+
+</div> -->
+
+</div>
+</body>
+</html>
+

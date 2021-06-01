@@ -1,0 +1,73 @@
+{% extends 'admin/base_site.html' %}
+{% load suit_tags static %}
+
+{# Following is an example how to extend admin by custom CSS or JS files #}
+{# Add extra CSS for admin #}
+
+{% block addpic %}
+<h1 align="left">
+    <img src="{% static "images/LOGO_png.png" %}" width="100px" height="100px" viewBox="0 0 90 90" />
+        
+</h1>
+{% endblock %}
+ {% block extrahead %}
+   
+   <link rel="shortcut icon" href="{% static 'logo1.png'  %}" />
+
+{% endblock %}  
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/demo.css' %}">
+{% endblock %}
+
+{#{% block foot %}#}
+{#    {{ block.super }}#}
+{#    <script type="text/javascript"></script>#}
+{#{% endblock %}#}
+
+
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'images/LOGO_png.png' %}" height="40px" />
+    </a>
+</h1>
+{% endblock %}
+
+
+{# Switch for demonstration purposes, not indended for production use #}
+{% block usertools %}
+    {% with suit_layout='layout'|suit_conf:request %}
+        {% if suit_layout == 'horizontal' %}
+            <a href="{% url 'admin:index' %}?__suit_layout=vertical" class="demo-layout-switch">
+            
+            </a>
+        {% else %}
+            <a href="{% url 'admin:index' %}?__suit_layout=horizontal" class="demo-layout-switch">
+                
+            </a> -->
+        {% endif %}
+
+        {{ block.super }}
+
+    {% endwith %}
+
+    <style type="text/css">
+        body #header a.demo-layout-switch {
+            color: #687086;
+        }
+
+        body.suit_layout_vertical .demo-layout-switch {
+            background-color: #383D4B;
+            order: 10;
+            text-align: center;
+            padding: .5rem 0;
+        }
+    </style>
+{% endblock %}
+
+{# Footer copyright (right side) #}
+{% block copyright %}
+   
+{% endblock %}

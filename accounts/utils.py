@@ -3,7 +3,7 @@ import random
 from accounts.models import *
 from django.core.mail import send_mail
 from django.conf import settings
-from ripple_wallet.models import AdminEmail
+from xrpl_wallet.models import AdminEmail
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.utils.encoding import force_bytes,force_text
 from django.contrib.sites.shortcuts import get_current_site

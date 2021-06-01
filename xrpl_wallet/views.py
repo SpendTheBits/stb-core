@@ -10,11 +10,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import filters
 from django.http import JsonResponse
 # from wallet.serializers import *
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
-from ripple_wallet.serializers import *
+from xrpl_wallet.serializers import *
 import decimal
 from NamedAtomicLock import NamedAtomicLock
 import json
@@ -30,22 +30,22 @@ from django.views.decorators.csrf import csrf_exempt
 from django.dispatch import receiver
 
 from django.db.models.signals import pre_save,post_save
-from ripple_wallet.ripple_utils import (update_all_ripple_accounts,get_btc_from_xrp,
-    get_btc_balance_for_ripple_wallet,update_ripple_account,ledger_history,get_lastledgersequence,
+from xrpl_wallet.xrpl_utils import (update_all_xrpl_accounts,get_btc_from_xrp,
+    get_btc_balance_for_xrpl_wallet,update_xrpl_account,ledger_history,get_lastledgersequence,
     get_sequence_number)
 
-from ripple_wallet.funding_transactions import (set_ripple_wallet_to_receive_funds,
+from xrpl_wallet.funding_transactions import (set_xrpl_wallet_to_receive_funds,
     get_wallet_activation_fee_in_btc,get_btc_to_currency,time_left_before_allowing_transaction,
     transfer_stb_to_wallet,set_trust_lines,set_rippling,request_to_set_trust_lines,
     create_fund_transaction_object,calculate_bitcoin_amount_to_sent)
 
-from ripple_wallet.stb_transactions import  (create_transaction_object,initiate_transaction,
+from xrpl_wallet.stb_transactions import  (create_transaction_object,initiate_transaction,
     xrp_transfer,process_transaction_result,create_transfer,update_related_transaction_as_failed,
     issue_btc_to_stb_wallet,update_otp_status_and_ref_no_for_stb_transaction)
 
 
 from authy.api import AuthyApiClient
-from ripple_wallet.submit_tx import submit_transaction
+from xrpl_wallet.submit_tx import submit_transaction
 from rest_framework.settings import api_settings
 from rest_framework.pagination import PageNumberPagination
 from .pagination import PaginationHandlerMixin
@@ -193,17 +193,17 @@ def notify_bitgo_confirmed(request):
                     fund_object.save()
                     logger.info("ledger is created")
 
-                wallet = RippleWallet.objects.get(user=user)
+                wallet = xrplWallet.objects.get(user=user)
                 is_funded = wallet.is_funded
                 is_trust_line_set = wallet.is_trust_line_set
                 logger.info("is_funded is",is_funded)
-                customer_ripple_address = wallet.account_id
+                customer_xrpl_address = wallet.account_id
 
                 if is_trust_line_set:#Means funded also
 
                     bitcoin_amount = calculate_bitcoin_amount_to_sent(value_in_btc,fund_object)        
                     logger.info("final_bitcoin amount to transfer is",bitcoin_amount)
-                    response_dict = issue_btc_to_stb_wallet(customer_ripple_address,bitcoin_amount,fund_object)
+                    response_dict = issue_btc_to_stb_wallet(customer_xrpl_address,bitcoin_amount,fund_object)
                     if response_dict['error'] is True:                
                         fund_object.is_error_occurred = True
                         fund_object.status = 'failed'
@@ -242,7 +242,7 @@ def notify_bitgo_confirmed(request):
                         logger.info("remaining_bitcoin is",remaining_bitcoin)
 
                         try:
-                            response_dict = set_ripple_wallet_to_receive_funds(customer_ripple_address,'activation_through_funding',fund_object.id)
+                            response_dict = set_xrpl_wallet_to_receive_funds(customer_xrpl_address,'activation_through_funding',fund_object.id)
                         except Exception as e:
                             logger.info("error in line@188 is",e)
                             fund_object.is_error_occurred = True
@@ -257,7 +257,7 @@ def notify_bitgo_confirmed(request):
                     
                     else:#wallet.is_funded is True:
                         bitcoin_amount = value_in_btc
-                        request_to_set_trust_lines(customer_ripple_address)
+                        request_to_set_trust_lines(customer_xrpl_address)
 
                     bitcoin_amount = calculate_bitcoin_amount_to_sent(bitcoin_amount,fund_object) 
                     logger.info("bitcoin_amount line 228 is ",bitcoin_amount)
@@ -280,15 +280,15 @@ def notify_bitgo_confirmed(request):
 class UpdateBalances(APIView):
     permission_classes = [AllowAny]
     def get(self, request, format=None):
-        result2 = update_all_ripple_accounts()
+        result2 = update_all_xrpl_accounts()
         logger.info("result is @411",result2)
         return Response({'msg':"Success"},status=status.HTTP_200_OK)
 
 
-class GetRippleBalance(APIView):
+class GetxrplBalance(APIView):
     def get(self, request, format=None):
         user = request.user
-        wallet_obj = RippleWallet.objects.get(user=user)
+        wallet_obj = xrplWallet.objects.get(user=user)
         # account_id = wallet_obj.account_id
         btc_balance = wallet_obj.bitcoin_balance
 
@@ -466,7 +466,7 @@ class VerifyStbToStbOtp(APIView):
         else:
             ip = request.META.get('REMOTE_ADDR')
 
-        sender = RippleWallet.objects.get(user=user)
+        sender = xrplWallet.objects.get(user=user)
         logger.info("user in verify stb to stb is",user)
         
         data = request.data
@@ -526,8 +526,8 @@ class VerifyStbToStbOtp(APIView):
 class GetAddress(APIView):
     def get(self, request, format=None):
         user = request.user
-        wallet_obj = RippleWallet.objects.get(user=user)
-        ripple_address = wallet_obj.account_id
+        wallet_obj = xrplWallet.objects.get(user=user)
+        xrpl_address = wallet_obj.account_id
         user_profile_obj = UserProfile.objects.get(user=user)
         payid_obj = PayId.objects.get(user_profile = user_profile_obj)
         payid = payid_obj.get_uri()
@@ -538,7 +538,7 @@ class GetAddress(APIView):
             bitcoin_address = None
         # bitcoin_account = BitcoinWalletAccount.objects.get(user=user)
         # bitcoin_address = FundingAddress.objects.filter(bitcoin_account=bitcoin_account).first().address
-        return Response({'bitcoin_address':bitcoin_address,"payid":payid,"ripple_address":ripple_address},status=status.HTTP_200_OK)
+        return Response({'bitcoin_address':bitcoin_address,"payid":payid,"xrpl_address":xrpl_address},status=status.HTTP_200_OK)
 
 class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'
@@ -549,7 +549,7 @@ class GetUserTransactions(APIView,PaginationHandlerMixin):
 
     def get(self, request, format=None):
         user = request.user
-        wallet_obj = RippleWallet.objects.get(user=user)
+        wallet_obj = xrplWallet.objects.get(user=user)
         qs1 = STBTransaction.objects.filter(sender = wallet_obj,is_otp_verfied=True,transaction_type="NORMAL")
         qs2 = STBTransaction.objects.filter(receiver = wallet_obj,is_otp_verfied=True,transaction_type="NORMAL")
 
@@ -758,7 +758,7 @@ class SetTrustLines(APIView):
         except Exception as e:
             return Response({"error":{'message':'invalid token"'},"sucsess":success}, status=400)
 
-        wallet_obj = RippleWallet.objects.get(user=user)
+        wallet_obj = xrplWallet.objects.get(user=user)
         address = wallet_obj.account_id
 
         if wallet_obj.is_trust_line_set is True:
@@ -852,7 +852,7 @@ class SetTrustLines(APIView):
 class GetSeed(APIView):
     def get(self, request, format=None):
         user = request.user
-        wallet = RippleWallet.objects.get(user=user)
+        wallet = xrplWallet.objects.get(user=user)
 
         is_master_seed_noted_down = wallet.is_master_seed_noted_down
         if is_master_seed_noted_down is True:
@@ -872,7 +872,7 @@ class GetSeed(APIView):
 class DeleteSeed(APIView):
     def get(self, request, format=None):
         user = request.user
-        wallet = RippleWallet.objects.get(user=user)
+        wallet = xrplWallet.objects.get(user=user)
         wallet.master_seed = None
         wallet.master_key = None
         wallet.master_seed_hex = None
@@ -919,8 +919,8 @@ def get_transaction_urls(request):
 
 
 def set_master_key(request):
-    ripple_wallet_list = RippleWallet.objects.filter(master_key=None)
-    for wallet in ripple_wallet_list:
+    xrpl_wallet_list = xrplWallet.objects.filter(master_key=None)
+    for wallet in xrpl_wallet_list:
         seed = wallet.master_seed
         j = get_mnemonic_code(seed)
         # j = "dd"
@@ -935,7 +935,7 @@ class SendXrp(APIView):
         logger.info("dats is",data)
         user = request.user
         logger.info("user is",user)
-        sender = RippleWallet.objects.get(user=user)
+        sender = xrplWallet.objects.get(user=user)
         receiver_address = data['address']
         secret_key = data['secret_key']
         logger.info("receiver_address uis",receiver_address)
@@ -956,7 +956,7 @@ class ManualXrp(APIView):
         # logger.info("dats is",data)
         # user = request.user
         # logger.info("user is",user)
-        # sender = RippleWallet.objects.get(user=user)
+        # sender = xrplWallet.objects.get(user=user)
         receiver_address = data['receiver']
         sender_address = data['sender']
         secret_key = data['secret_key']
@@ -975,14 +975,14 @@ class CheckPassphrase(APIView):
         data = request.data
         user = request.user
 
-        wallet = RippleWallet.objects.get(user=user)
+        wallet = xrplWallet.objects.get(user=user)
         if wallet.is_funded is False:
             return Response({"msg":"Ok"},status=200)
         secret = data.get('secret',None)
         if secret is None:
             return Response({"msg":"No key entered"},status=400)
 
-        sender = RippleWallet.objects.get(user=user)
+        sender = xrplWallet.objects.get(user=user)
         customer_address = sender.account_id
         # sequence_error1 = True
         # while (sequence_error1==True):
@@ -1030,14 +1030,14 @@ class GetUserFromPayid(APIView):
             user = User.objects.get(username=username)
             user_profile_obj = UserProfile.objects.get(user=user)
 
-            ripple_address = RippleWallet.objects.get(user=user).account_id
+            xrpl_address = xrplWallet.objects.get(user=user).account_id
             payid_obj = PayId.objects.get(user_profile = user_profile_obj)
             payid = payid_obj.get_uri()
 
             email = user.email
            
             logger.info("username is ",username)
-            return Response({"success" :{'username':username,'address':ripple_address,"email":email,"payid":payid},"error":error }, status=200)
+            return Response({"success" :{'username':username,'address':xrpl_address,"email":email,"payid":payid},"error":error }, status=200)
         if serializer.errors:
             errors = serializer.errors
             logger.info("error is ",errors)
@@ -1079,7 +1079,7 @@ class DeriveAddressFromPayid(APIView):
             return Response({"msg":"Invalid payid"},status=401)
         user = payid_obj.user_profile.user
 
-        stb_wallet = RippleWallet.objects.get(user=user)
+        stb_wallet = xrplWallet.objects.get(user=user)
         address = stb_wallet.account_id
 
 
@@ -1094,7 +1094,7 @@ class DeriveAddressFromPayid(APIView):
 class GetLatestTransaction(APIView):
     def get(self, request, format=None):
         user = request.user
-        wallet_obj = RippleWallet.objects.get(user=user)
+        wallet_obj = xrplWallet.objects.get(user=user)
         qs1 = STBTransaction.objects.filter(sender = wallet_obj,is_otp_verfied=True,transaction_type="NORMAL")
         qs2 = STBTransaction.objects.filter(receiver = wallet_obj,is_otp_verfied=True,transaction_type="NORMAL")
 
@@ -1157,7 +1157,7 @@ class GetLatestTransaction(APIView):
             to_send.append(to_add)
 
 
-        wallet_obj = RippleWallet.objects.get(user=user)
+        wallet_obj = xrplWallet.objects.get(user=user)
     
         qs4 = WithDrawalTransaction.objects.filter(sender=wallet_obj,is_otp_verfied=True,
             transaction_type="NORMAL")
@@ -1199,9 +1199,9 @@ class GetReportData(APIView):
         return Response(res,status=200)
 
 
-# from ripple_wallet.funding_transactions/ import set_trust_lines
+# from xrpl_wallet.funding_transactions/ import set_trust_lines
 
-# from ripple_wallet.funding_transactions/ import set_trust_lines
+# from xrpl_wallet.funding_transactions/ import set_trust_lines
 
 def send_notification_to_set_trustline(wallets,new_id):
     logger.info('call to send notification for trust line')
@@ -1219,7 +1219,7 @@ def send_notification_to_set_trustline(wallets,new_id):
                 }
             ]
             }
-            response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+            response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
             json_response = response.json()
             
             lines = json_response['result']['lines']
@@ -1260,7 +1260,7 @@ def on_change(sender, instance: CentralWallet, **kwargs):
         # else:
             # send notification to all users to set new trust line
             # logger.info('call notification for trust line')
-        stb_wallets=RippleWallet.objects.all().exclude(id=instance.wallet.id)
+        stb_wallets=xrplWallet.objects.all().exclude(id=instance.wallet.id)
         # logger.info('all user wallets',stb_wallets)
         # pool=Pool(processes=1)
         # pool.apply_async(send_notification_to_set_trustline,[stb_wallets])

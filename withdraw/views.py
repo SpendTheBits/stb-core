@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .serializers import *
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 from withdraw.models import *
 from django.shortcuts import render
 
@@ -12,16 +12,16 @@ from django.utils import timezone
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import filters
 # from wallet.serializers import *
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
-from ripple_wallet.serializers import *
+from xrpl_wallet.serializers import *
 import decimal
 import json
 import requests
-from ripple_wallet.sign import sign_transaction
-from ripple_wallet.serialize import serialize_object
+from xrpl_wallet.sign import sign_transaction
+from xrpl_wallet.serialize import serialize_object
 import threading
 
 from accounts.models import UserProfile,User
@@ -30,17 +30,17 @@ from blockchain.wallet import Wallet
 from datetime import timedelta,datetime
 
 import time
-from ripple_wallet.ripple_utils import (update_all_ripple_accounts,
-get_btc_balance_for_ripple_wallet,update_ripple_account,ledger_history,get_lastledgersequence,
+from xrpl_wallet.xrpl_utils import (update_all_xrpl_accounts,
+get_btc_balance_for_xrpl_wallet,update_xrpl_account,ledger_history,get_lastledgersequence,
 get_sequence_number)
-from ripple_wallet.funding_transactions import (set_ripple_wallet_to_receive_funds,
+from xrpl_wallet.funding_transactions import (set_xrpl_wallet_to_receive_funds,
 get_wallet_activation_fee_in_btc,get_btc_to_currency,time_left_before_allowing_transaction,
 transfer_stb_to_wallet,set_trust_lines,set_rippling)
 from withdraw.withdrawal_transaction import  (create_withdraw_transaction_object,
     time_left_before_allowing_transaction_blocked_due_to_withrawal,initiate_withdraw_transaction,
     update_otp_status_and_ref_no_for_withdraw_transaction)
 from authy.api import AuthyApiClient
-from ripple_wallet.submit_tx import submit_transaction
+from xrpl_wallet.submit_tx import submit_transaction
 from rest_framework.settings import api_settings
 
 from twilio.rest import Client

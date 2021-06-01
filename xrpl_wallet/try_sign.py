@@ -2,14 +2,14 @@
 
 ################################################################################
 # XRPL Key Derivation Code
-# Author: rome@ripple.com
-# Copyright Ripple 2019
+# Author: rome@xrpl.com
+# Copyright xrpl 2019
 # This sample code is provided as a reference for educational purposes. It is
 # not optimized for speed or for security. Use this code at your own risk and
 # exercise due caution before using it with real money or infrastructure.
 # This file is provided under the MIT license along with the rest of the
 # XRP Ledger Dev Portal docs and sample code:
-# https://github.com/ripple/xrpl-dev-portal/blob/master/LICENSE
+# https://github.com/xrpl/xrpl-dev-portal/blob/master/LICENSE
 # Some of its dependencies are released under other licenses or are adapted
 # from public domain code. See their respective files for details.
 ################################################################################
@@ -283,7 +283,7 @@ def compress_secp256k1_public(point):
 def swap_byte_order(buf):
     """
     Swap the byte order of a bytes object.
-    The rippled implementation of RFC-1751 uses the reversed byte order as the
+    The xrpld implementation of RFC-1751 uses the reversed byte order as the
     examples included in the RFC-1751 spec (which doesn't mention byte order).
     """
     size = len(buf)

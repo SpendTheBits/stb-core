@@ -31,7 +31,7 @@ AUTH_USER_MODEL = 'accounts.User'
 # Application definition
 
 INSTALLED_APPS = [
-    'ripple_wallet.apps.SuitConfig',
+    'xrpl_wallet.apps.SuitConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'import_export',
     'corsheaders',
     'admin_reorder',
-    'ripple_wallet',
+    'xrpl_wallet',
     "push_notifications",
     "fcm_django",
     'payid',
@@ -100,7 +100,7 @@ BITGO_KEY = env('bitgo_key')
 BITGO_COIN=env('bitgo_coin')
 PAYID_URI_DOMAIN = env('payid_uri_domain')
 CURRENT_API_URL = env('api_url')
-RIPPLE_SUBMIT_SERVER = env('ripple_net')
+xrpl_SUBMIT_SERVER = env('xrpl_net')
 BITGO_PASSPHRASE=env('bitgo_passphrase')
 SMS_APP_HASH = env('sms_hash')
 WITHDRAW_TRANSACTION_URL="https://live.blockcypher.com/btc-testnet/tx/"
@@ -195,58 +195,58 @@ ADMIN_REORDER = (
 'models': ('accounts.User','accounts.UserProfile')
 },
 # Second group: same app, but different label
-{'app': 'ripple_wallet', 'label': 'Wallet',
-'models': ('ripple_wallet.RippleWallet','ripple_wallet.BitcoinWalletAccount',
+{'app': 'xrpl_wallet', 'label': 'Wallet',
+'models': ('xrpl_wallet.xrplWallet','xrpl_wallet.BitcoinWalletAccount',
 
 )},
 # Second group: same app, but different label
-{'app': 'ripple_wallet', 'label': 'Transactions',
-'models': ('ripple_wallet.STBTransaction','ripple_wallet.FundingTransaction',
+{'app': 'xrpl_wallet', 'label': 'Transactions',
+'models': ('xrpl_wallet.STBTransaction','xrpl_wallet.FundingTransaction',
 'withdraw.WithDrawalTransaction',
 'withdraw.Ledger',
 'withdraw.BitcoinNetworkLedger',
 )
 },
 # Second group: same app, but different label
-{'app': 'ripple_wallet', 'label': 'Configurations',
+{'app': 'xrpl_wallet', 'label': 'Configurations',
 'models':
-('ripple_wallet.Commission',
-'ripple_wallet.AdminEmail',
-'ripple_wallet.AppNotification',
+('xrpl_wallet.Commission',
+'xrpl_wallet.AdminEmail',
+'xrpl_wallet.AppNotification',
 'accounts.DerogatoryWords',
 'withdraw.NetworkFees',
 'withdraw.WithdrawLimit',
 'withdraw.WithdrawApproval',
-'ripple_wallet.AppConfiguration',
+'xrpl_wallet.AppConfiguration',
 
 )
 },
 
 
-{'app': 'ripple_wallet', 'label': 'BTC Currency Issuer Wallet',
+{'app': 'xrpl_wallet', 'label': 'BTC Currency Issuer Wallet',
 'models': (
-'ripple_wallet.CentralWallet',
+'xrpl_wallet.CentralWallet',
 )
 },
 
 
-{'app': 'ripple_wallet', 'label': 'Commission Wallet',
+{'app': 'xrpl_wallet', 'label': 'Commission Wallet',
 'models': (
-'ripple_wallet.CommissionWallet',
+'xrpl_wallet.CommissionWallet',
 )
 },
 
 
-{'app': 'ripple_wallet', 'label': 'Pending Due to Trust Line',
+{'app': 'xrpl_wallet', 'label': 'Pending Due to Trust Line',
 'models': (
 
-'ripple_wallet.PendingTransactions',
-'ripple_wallet.PendingFundTransactions',
+'xrpl_wallet.PendingTransactions',
+'xrpl_wallet.PendingFundTransactions',
 )
 },
 
 
-{'app': 'ripple_wallet', 'label': 'Payid',
+{'app': 'xrpl_wallet', 'label': 'Payid',
 'models': (
 
 'payid.CryptoAddress',
@@ -254,19 +254,19 @@ ADMIN_REORDER = (
 )
 },
 
-{'app': 'ripple_wallet', 'label': 'Meta',
+{'app': 'xrpl_wallet', 'label': 'Meta',
 'models': (
 
-'ripple_wallet.Currency',
+'xrpl_wallet.Currency',
 'accounts.Country',
-'ripple_wallet.ExchangeRate',
+'xrpl_wallet.ExchangeRate',
 'accounts.Version',
 
 'push_notifications.GCMDevice',
 # 'push_notifications.APNSDevice',
 
-'ripple_wallet.FundingAddress',
-'ripple_wallet.TransactionOtpAttempt',
+'xrpl_wallet.FundingAddress',
+'xrpl_wallet.TransactionOtpAttempt',
 'withdraw.WithdrawTransactionOtpAttempt',
 'kyc.KycAttempt',
 'kyc.KycApplication',
@@ -293,7 +293,7 @@ EMAIL_HOST = env('email_host')
 EMAIL_HOST_USER = env('email_user')
 EMAIL_HOST_PASSWORD = env('email_password')
 EMAIL_PORT = int(env('email_port'))
-RIPPLE_SERVER=env('ripple_server')
+xrpl_SERVER=env('xrpl_server')
 
 #twilio key
 ACCOUNT_SECURITY_API_KEY=env('twilio_key')

@@ -1,8 +1,8 @@
 from django.apps import AppConfig
 
 
-class RippleWalletConfig(AppConfig):
-    name = 'ripple_wallet'
+class xrplWalletConfig(AppConfig):
+    name = 'xrpl_wallet'
 
 
 from suit.apps import DjangoSuitConfig
@@ -20,31 +20,31 @@ class SuitConfig(DjangoSuitConfig):
         ]),
 
         ParentItem('Wallet', children=[
-            ChildItem(model='ripple_wallet.RippleWallet'),
-            ChildItem(model='ripple_wallet.BitcoinWalletAccount'),
+            ChildItem(model='xrpl_wallet.xrplWallet'),
+            ChildItem(model='xrpl_wallet.BitcoinWalletAccount'),
             
         ]),
 
 
         ParentItem('Transactions', children=[
-            ChildItem(model='ripple_wallet.STBTransaction'),
-            ChildItem(model='ripple_wallet.FundingTransaction'),
+            ChildItem(model='xrpl_wallet.STBTransaction'),
+            ChildItem(model='xrpl_wallet.FundingTransaction'),
             
         ]),
 
 
         ParentItem('Configurations', children=[
-            ChildItem(model='ripple_wallet.Commission'),
-            ChildItem(model='ripple_wallet.AppConfiguration'),
+            ChildItem(model='xrpl_wallet.Commission'),
+            ChildItem(model='xrpl_wallet.AppConfiguration'),
             
         ]),
 
 
         ParentItem('Meta', children=[
-            ChildItem(model='ripple_wallet.Currency'),
+            ChildItem(model='xrpl_wallet.Currency'),
             ChildItem(model='accounts.Country'),
             ChildItem(model='accounts.Logo'),
-            ChildItem(model='ripple_wallet.CentralWallet'),
+            ChildItem(model='xrpl_wallet.CentralWallet'),
 
 
             

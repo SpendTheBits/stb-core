@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 from push_notifications.models import APNSDevice, GCMDevice
 from django.utils.timezone import now
 from django.utils.html import format_html
-from ripple_wallet.ripple_utils import update_all_ripple_accounts,update_ripple_account
+from xrpl_wallet.xrpl_utils import update_all_xrpl_accounts,update_xrpl_account
 from django.conf import settings
 from .funding_transactions import *
 from withdraw.models import *
@@ -50,10 +50,10 @@ class STBTransactionInLine(admin.StackedInline):
     def has_change_permission(self, request, obj=None):
         return False
 
-class RippleWalletAdmin(admin.ModelAdmin):
-    fields=['user','account_id','key_type','is_funded','is_trust_line_set','is_master_seed_noted_down','ripple_balance','bitcoin_balance']
-    list_display = ['id','user','account_id','payid','master_seed','ripple_balance','bitcoin_balance','is_funded','is_trust_line_set']
-    # list_display = ['id','user','account_id','payid','trust_line_button','ripple_balance','bitcoin_balance','is_funded','is_trust_line_set']
+class xrplWalletAdmin(admin.ModelAdmin):
+    fields=['user','account_id','key_type','is_funded','is_trust_line_set','is_master_seed_noted_down','xrpl_balance','bitcoin_balance']
+    list_display = ['id','user','account_id','payid','master_seed','xrpl_balance','bitcoin_balance','is_funded','is_trust_line_set']
+    # list_display = ['id','user','account_id','payid','trust_line_button','xrpl_balance','bitcoin_balance','is_funded','is_trust_line_set']
     search_fields = ('account_id','user__username')
     # readonly_fields=['trust_line_button',]
     inlines=[STBTransactionInLine,WithDrawalTransactionInLine]
@@ -131,8 +131,8 @@ class BitcoinWalletAccountAdmin(admin.ModelAdmin):
 
 
 class STBTransactionResouce(resources.ModelResource):
-    sender = fields.Field(column_name='sender',attribute='sender',widget=ForeignKeyWidget(RippleWallet,'user'))
-    receiver = fields.Field(column_name='receiver',attribute='receiver',widget=ForeignKeyWidget(RippleWallet,'user'))
+    sender = fields.Field(column_name='sender',attribute='sender',widget=ForeignKeyWidget(xrplWallet,'user'))
+    receiver = fields.Field(column_name='receiver',attribute='receiver',widget=ForeignKeyWidget(xrplWallet,'user'))
     related_funding_transaction=fields.Field(column_name='related_funding_transaction',attribute='related_funding_transaction',widget=ForeignKeyWidget(FundingTransaction,'user'))
     class Meta:
         model=STBTransaction
@@ -162,43 +162,43 @@ class STBTransactionAdmin(ExportMixin,admin.ModelAdmin):
         return True if request.user.is_superuser else False 
  
 class IssuerWalletAdmin(admin.ModelAdmin):
-    list_display = ['id','wallet','address','bitcoin_balance','ripple_balance']
+    list_display = ['id','wallet','address','bitcoin_balance','xrpl_balance']
     def bitcoin_balance(self,obj):
         issuer_wallet_obj = obj.wallet
         balance = issuer_wallet_obj.bitcoin_balance
         return balance
-    def ripple_balance(self,obj):
+    def xrpl_balance(self,obj):
         issuer_wallet_obj = obj.wallet
-        balance = issuer_wallet_obj.ripple_balance
+        balance = issuer_wallet_obj.xrpl_balance
         return balance
     def address(self,obj):
         issuer_wallet_obj = obj.wallet
-        ripple_address = issuer_wallet_obj.account_id
-        return ripple_address
+        xrpl_address = issuer_wallet_obj.account_id
+        return xrpl_address
     def has_delete_permission(self, request, obj=None):
         return False
 
 
 class CommissionWalletAdmin(admin.ModelAdmin):
-    list_display = ['id','wallet','address','bitcoin_balance','ripple_balance']
+    list_display = ['id','wallet','address','bitcoin_balance','xrpl_balance']
     def bitcoin_balance(self,obj):
         issuer_wallet_obj = obj.wallet
         balance = issuer_wallet_obj.bitcoin_balance
         return balance
-    def ripple_balance(self,obj):
+    def xrpl_balance(self,obj):
         issuer_wallet_obj = obj.wallet
-        balance = issuer_wallet_obj.ripple_balance
+        balance = issuer_wallet_obj.xrpl_balance
         return balance
     def address(self,obj):
         issuer_wallet_obj = obj.wallet
-        ripple_address = issuer_wallet_obj.account_id
-        return ripple_address
+        xrpl_address = issuer_wallet_obj.account_id
+        return xrpl_address
     def has_delete_permission(self, request, obj=None):
         return False
     
 class AppConfigurationAdmin(admin.ModelAdmin):
     list_display = ['id','name','current_reference_number',
-    'current_withdraw_reference_number','minimum_ripple_balance',
+    'current_withdraw_reference_number','minimum_xrpl_balance',
     'minimum_bitcoin_balance',]
 
 
@@ -214,7 +214,7 @@ class TransactionOtpAttemptAdmin(admin.ModelAdmin):
         return True
 
 class MinimumbalanceAdmin(admin.ModelAdmin):
-    list_display = ['minimum_ripple_balance','minimum_bitcoin_balance','send_email_to','active'
+    list_display = ['minimum_xrpl_balance','minimum_bitcoin_balance','send_email_to','active'
     ]
 
 
@@ -381,7 +381,7 @@ class FundingAddressAdmin(admin.ModelAdmin):
         return True
     def has_delete_permission(self,request,obj=None):
         return True
-admin.site.register(RippleWallet,RippleWalletAdmin)
+admin.site.register(xrplWallet,xrplWalletAdmin)
 admin.site.register(BitcoinWalletAccount,BitcoinWalletAccountAdmin)
 admin.site.register(FundingAddress,FundingAddressAdmin)
 admin.site.register(Commission,CommissionAdmin)

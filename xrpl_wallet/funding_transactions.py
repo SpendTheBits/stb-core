@@ -1,11 +1,11 @@
-from ripple_wallet.models import  *
+from xrpl_wallet.models import  *
 import logging
 logger = logging.getLogger(__name__)
-# from ripple_wallet.models import  TransactionOtpAttempt
-from ripple_wallet.submit_tx import sign_and_submit_transaction,single_sign_and_submit_transaction
+# from xrpl_wallet.models import  TransactionOtpAttempt
+from xrpl_wallet.submit_tx import sign_and_submit_transaction,single_sign_and_submit_transaction
 
-from ripple_wallet.ripple_utils import (get_lastledgersequence,get_sequence_number,get_btc_from_xrp,
-    update_all_ripple_accounts,update_ripple_account)
+from xrpl_wallet.xrpl_utils import (get_lastledgersequence,get_sequence_number,get_btc_from_xrp,
+    update_all_xrpl_accounts,update_xrpl_account)
 
 import requests
 import decimal
@@ -85,7 +85,7 @@ def fund_account(customer_address,transaction_type,transaction_id):
 
     logger.info("customer address is",customer_address)
     account_id = customer_address
-    wallet_obj = RippleWallet.objects.get(account_id=account_id)
+    wallet_obj = xrplWallet.objects.get(account_id=account_id)
     
     issuing_wallet = CentralWallet.objects.filter(active=True).first().wallet
     # secret = issuing_wallet.master_seed
@@ -166,7 +166,7 @@ def set_trust_lines(customer_address,secret,is_testing=None): #ADITYAAA
     logger.info("customer address is",customer_address)
     logger.info("@101")
     account_id = customer_address
-    wallet_obj = RippleWallet.objects.get(account_id=account_id)
+    wallet_obj = xrplWallet.objects.get(account_id=account_id)
     logger.info("account_id",account_id)
 
     #this is done because in testnet,acoount is used by many so sequence number nit in our control
@@ -237,7 +237,7 @@ def set_trust_lines(customer_address,secret,is_testing=None): #ADITYAAA
 def transfer_stb_to_wallet(customer_address,bitcoin_amount,secret_key):
     # user = request.user
     logger.info("@1333")
-    wallet_obj = RippleWallet.objects.get(account_id=customer_address)
+    wallet_obj = xrplWallet.objects.get(account_id=customer_address)
     if secret_key!="not":
         set_trust_lines(customer_address,secret_key)
     logger.info("bitcoin amount is",bitcoin_amount)
@@ -282,20 +282,20 @@ def transfer_stb_to_wallet(customer_address,bitcoin_amount,secret_key):
     response_dict = sign_and_submit_transaction(tx_json,secret)
     logger.info("response dict after submit is",response_dict)
 
-    #updating all ripple accounts ripple as well as bitcoin balance
-    x = update_ripple_account(customer_address)
-    y = update_ripple_account(issuer)
+    #updating all xrpl accounts xrpl as well as bitcoin balance
+    x = update_xrpl_account(customer_address)
+    y = update_xrpl_account(issuer)
     # try:
-    #     result = update_all_ripple_accounts()
+    #     result = update_all_xrpl_accounts()
     # except Exception as e:
-    #     logger.info("error in updating ripple accounts is",e)
+    #     logger.info("error in updating xrpl accounts is",e)
     return response_dict
 
 
 def request_to_set_trust_lines(account_id): #ADITYAAAAAA
     logger.info("request_to_set_trust_lines")
     logger.info("account_id is",account_id)
-    wallet_obj = RippleWallet.objects.get(account_id=account_id)
+    wallet_obj = xrplWallet.objects.get(account_id=account_id)
     user = wallet_obj.user
     token_error =True
     while token_error==True:
@@ -336,7 +336,7 @@ def request_to_set_trust_lines(account_id): #ADITYAAAAAA
     return
 
 
-def set_ripple_wallet_to_receive_funds(customer_address,transaction_type,transaction_id):
+def set_xrpl_wallet_to_receive_funds(customer_address,transaction_type,transaction_id):
 
     sequence_error1 = True
     while (sequence_error1==True):
@@ -344,12 +344,12 @@ def set_ripple_wallet_to_receive_funds(customer_address,transaction_type,transac
         if response_dict['engine_result']!='tefPAST_SEQ':
             sequence_error1 = False
 
-    x = update_ripple_account(customer_address)
+    x = update_xrpl_account(customer_address)
 
     if response_dict['error'] is True:
         return response_dict
 
-    logger.info("after setting fund in set_ripple_wallet_to_receive_funds came here ")
+    logger.info("after setting fund in set_xrpl_wallet_to_receive_funds came here ")
     response = request_to_set_trust_lines(customer_address)
 
 

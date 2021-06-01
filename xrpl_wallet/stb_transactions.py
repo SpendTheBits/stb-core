@@ -1,8 +1,8 @@
-from ripple_wallet.models import *
-from ripple_wallet.ripple_utils import get_lastledgersequence,get_sequence_number,update_ripple_account
-from ripple_wallet.submit_tx import sign_and_submit_transaction,sign_tx_json,submit_transaction
-from ripple_wallet.funding_transactions import (set_ripple_wallet_to_receive_funds,
-    update_all_ripple_accounts)
+from xrpl_wallet.models import *
+from xrpl_wallet.xrpl_utils import get_lastledgersequence,get_sequence_number,update_xrpl_account
+from xrpl_wallet.submit_tx import sign_and_submit_transaction,sign_tx_json,submit_transaction
+from xrpl_wallet.funding_transactions import (set_xrpl_wallet_to_receive_funds,
+    update_all_xrpl_accounts)
 import decimal
 import threading
 import time
@@ -290,9 +290,9 @@ def process_transaction_result(response_dict,transaction_id):
 
     #updating sender and receiver balances
     logger.info("updating sender addr@263")
-    x = update_ripple_account(sender_addr)
+    x = update_xrpl_account(sender_addr)
     logger.info("updating receive addr")
-    y = update_ripple_account(receiver_addr)
+    y = update_xrpl_account(receiver_addr)
 
 
     return
@@ -313,7 +313,7 @@ def create_iou_payment_transaction_json(sender_addr,receiver_addr,bitcoin_amount
 
     # if settings.PRODUCTION_ENV:
 
-    #     stb_wallet = RippleWallet.objects.get(account_id=sender_addr)
+    #     stb_wallet = xrplWallet.objects.get(account_id=sender_addr)
     #     sequence_number = stb_wallet.current_sequence_number
     #     if sequence_number is None:
     #         sequence_number = get_sequence_number(sender_addr)
@@ -642,7 +642,7 @@ def initiate_transaction(transaction_id,secret_key):
 
                 logger.info("not funded")
                 try:
-                    response_dict = set_ripple_wallet_to_receive_funds(
+                    response_dict = set_xrpl_wallet_to_receive_funds(
                         receiver_address,'activation_through_wallet',normal_transaction_object.id)
                 except  Exception as e:
                     logger.info("error in submitting transaction is @466",e)
@@ -657,8 +657,8 @@ def initiate_transaction(transaction_id,secret_key):
                     return
                 error = response_dict['error']
                 if error is True:
-                    #set_ripple_wallet_to_receive_funds failed
-                    logger.info("set_ripple_wallet_to_receive_funds failed")
+                    #set_xrpl_wallet_to_receive_funds failed
+                    logger.info("set_xrpl_wallet_to_receive_funds failed")
 
                     #updating status of related transaction as main transaction failed
                     update_related_transaction_as_failed(normal_transaction_object)
@@ -733,9 +733,9 @@ def xrp_transfer(sender_addr,receiver_addr,secret_key,amount):
 
     #updating sender and receiver balances
     logger.info("updating sender addr")
-    x = update_ripple_account(sender_addr)
+    x = update_xrpl_account(sender_addr)
     logger.info("updating receive addr")
-    y = update_ripple_account(receiver_addr)
+    y = update_xrpl_account(receiver_addr)
     logger.info("sending response dict")
     return response_dict
 
@@ -748,7 +748,7 @@ def issue_btc_to_stb_wallet(customer_address,bitcoin_amount,funding_transn_obj):
     logger.info("bitcoin amount is",bitcoin_amount)
 
     central_wallet = CentralWallet.objects.filter(active=True).first().wallet
-    receiver = RippleWallet.objects.get(account_id=customer_address)
+    receiver = xrplWallet.objects.get(account_id=customer_address)
     
     if settings.TEST_ENV:
         secret_key = central_wallet.master_seed
@@ -792,13 +792,13 @@ def issue_btc_to_stb_wallet(customer_address,bitcoin_amount,funding_transn_obj):
 
 
 
-    #updating all ripple accounts ripple as well as bitcoin balance
+    #updating all xrpl accounts xrpl as well as bitcoin balance
 
-    thread1 = threading.Thread(target=update_all_ripple_accounts, args=())
+    thread1 = threading.Thread(target=update_all_xrpl_accounts, args=())
     # try:
-    #     result = update_all_ripple_accounts()
+    #     result = update_all_xrpl_accounts()
     # except Exception as e:
-    #     logger.info("error in updating ripple accounts is",e)
+    #     logger.info("error in updating xrpl accounts is",e)
     return response_dict
 
 

@@ -13,9 +13,9 @@ import time
 import decimal
 from . import bitgo_utils
 # from .try_sign import get_mnemonic_code
-# from ripple_wallet.funding_transactions import set_trust_lines
-def create_ripple_wallet_and_bitcoin_addresss(user):
-    logger.info("came in create_ripple_wallet_and_bitcoin_addresss ")
+# from xrpl_wallet.funding_transactions import set_trust_lines
+def create_xrpl_wallet_and_bitcoin_addresss(user):
+    logger.info("came in create_xrpl_wallet_and_bitcoin_addresss ")
     try:
         user_profile_obj = UserProfile.objects.get(user=user)
         payid_obj = PayId.objects.create(user_profile=user_profile_obj,name=user.username)
@@ -23,25 +23,25 @@ def create_ripple_wallet_and_bitcoin_addresss(user):
     except Exception as e:
         logger.info('Error in create Payid=',str(e))
 
-    create_ripple_address(user_profile_obj)
+    create_xrpl_address(user_profile_obj)
     create_bitcoin_address(user_profile_obj)
     return 
 
-def create_ripple_address(user_profile_obj):
-    logger.info("came in create_ripple_wallet ")
+def create_xrpl_address(user_profile_obj):
+    logger.info("came in create_xrpl_wallet ")
 
-    ripple_server_ip = settings.RIPPLE_SERVER
+    xrpl_server_ip = settings.xrpl_SERVER
     payid_obj= PayId.objects.get(user_profile=user_profile_obj)
     if settings.PRODUCTION_ENV:
-        ripple_server_url = "http://"+str(ripple_server_ip)
+        xrpl_server_url = "http://"+str(xrpl_server_ip)
         to_send = {
                 "method": "wallet_propose",
                 "params": [{}]
             }
 
-        logger.info("riplle server url is ",ripple_server_url)
+        logger.info("riplle server url is ",xrpl_server_url)
         try:
-            response = requests.post(ripple_server_url, json=to_send)
+            response = requests.post(xrpl_server_url, json=to_send)
             response.raise_for_status()
         except  Exception as e:
             logger.info("error in wallet propose is",e)
@@ -50,17 +50,17 @@ def create_ripple_address(user_profile_obj):
         # logger.info("response in wallet propose is ",json_response)
         result = json_response['result']
 
-        ripple_wallet_obj  = RippleWallet(user=user_profile_obj.user)
-        ripple_wallet_obj.account_id = result['account_id']
-        ripple_wallet_obj.key_type = result['key_type']
-        ripple_wallet_obj.public_key = result['public_key']
-        ripple_wallet_obj.public_key_hex = result['public_key_hex']
-        ripple_wallet_obj.save()
+        xrpl_wallet_obj  = xrplWallet(user=user_profile_obj.user)
+        xrpl_wallet_obj.account_id = result['account_id']
+        xrpl_wallet_obj.key_type = result['key_type']
+        xrpl_wallet_obj.public_key = result['public_key']
+        xrpl_wallet_obj.public_key_hex = result['public_key_hex']
+        xrpl_wallet_obj.save()
         environment = "mainnet"
         address = result['account_id']
     else:
         try:
-            response = requests.post("https://faucet.altnet.rippletest.net/accounts")
+            response = requests.post("https://faucet.altnet.xrpltest.net/accounts")
             response.raise_for_status()
         except  Exception as e:
             logger.info("error in creating wallet for testnet is",e)
@@ -71,11 +71,11 @@ def create_ripple_address(user_profile_obj):
         secret_key = json_response['account']['secret']
         balance = json_response['balance']
 
-        ripple_wallet_obj  = RippleWallet(user=user_profile_obj.user)
-        ripple_wallet_obj.account_id = address
-        ripple_wallet_obj.master_seed = secret_key
-        ripple_wallet_obj.ripple_balance = decimal.Decimal(balance)
-        ripple_wallet_obj.save()
+        xrpl_wallet_obj  = xrplWallet(user=user_profile_obj.user)
+        xrpl_wallet_obj.account_id = address
+        xrpl_wallet_obj.master_seed = secret_key
+        xrpl_wallet_obj.xrpl_balance = decimal.Decimal(balance)
+        xrpl_wallet_obj.save()
         environment = "testnet"
     cryptoaddress_xrpl_obj = CryptoAddress.objects.create(paymentNetwork="XRPL",environment=environment,entity=payid_obj,address=address)
 

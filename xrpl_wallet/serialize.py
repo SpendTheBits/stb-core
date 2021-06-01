@@ -16,12 +16,12 @@ __all__ = ('serialize_object',)
 
 
 ##############################################################################
-# The following are copied close to verbatim from the ripple-lib JavaScript
+# The following are copied close to verbatim from the xrpl-lib JavaScript
 # source code. We possible could define the types in a simpler way in Python,
 # but I want to make it easy to update these structures as the JS lib changes.
 
 
-# From ripple-lib:binformat.js:exports.ledger
+# From xrpl-lib:binformat.js:exports.ledger
 LEDGER_ENTRY_TYPES = {
     'AccountRoot': [97],
     'Contract': [99],
@@ -31,12 +31,12 @@ LEDGER_ENTRY_TYPES = {
     'LedgerHashes': [104],
     'Nickname': [110],
     'Offer': [111],
-    'RippleState': [114],
+    'xrplState': [114],
     'FeeSettings': [115]
 }
 
 
-# From ripple-lib:binformat.js:exports.ter
+# From xrpl-lib:binformat.js:exports.ter
 TRANSACTION_RESULT_VALUES = {
     'tesSUCCESS': 0,
     'tecCLAIM': 100,
@@ -60,7 +60,7 @@ TRANSACTION_RESULT_VALUES = {
 }
 
 
-# From ripple-lib:binformat.js:exports.tx, manually constructed
+# From xrpl-lib:binformat.js:exports.tx, manually constructed
 TRANSACTION_TYPES = {
     'AccountSet': 3,
     'TrustSet': 20,
@@ -75,7 +75,7 @@ TRANSACTION_TYPES = {
 }
 
 
-# From ripple-lib:serializedtypes.js
+# From xrpl-lib:serializedtypes.js
 # Defines the types the binary format supports and the bits
 # representing those types.
 TYPES_MAP = [
@@ -109,7 +109,7 @@ TYPES_MAP = [
 ]
 
 
-# From ripple-lib:serializedtypes.js
+# From xrpl-lib:serializedtypes.js
 FIELDS_MAP = {
     # Common types
     1: {# Int16
@@ -151,7 +151,7 @@ FIELDS_MAP = {
         1: 'Amount', 2: 'Balance', 3: 'LimitAmount', 4: 'TakerPays',
         5: 'TakerGets', 6: 'LowLimit',
         7: 'HighLimit', 8: 'Fee', 9: 'SendMax', 16: 'MinimumOffer',
-        17: 'RippleEscrow'
+        17: 'xrplEscrow'
     },
     7: {# VL
         1: 'PublicKey', 2: 'MessageKey', 3: 'SigningPubKey', 4: 'TxnSignature',
@@ -245,7 +245,7 @@ def serialize_field(stream, name, value):
 
 def serialize_hex(stream, hexstring):
     """Serialize a hex-encoded value, i.e. '2AE75B908F0'.
-    In ripple-lib, this is ``serializedtypes.js:serialize_hex()``.
+    In xrpl-lib, this is ``serializedtypes.js:serialize_hex()``.
     """
     serialize_bytes(stream, decode_hex(hexstring))
 
@@ -257,17 +257,17 @@ def serialize_bytes(stream, bytes):
 
 
 def UInt160(value):
-    # In ripple-lib, UInt160 is an address. We simply use a string.
+    # In xrpl-lib, UInt160 is an address. We simply use a string.
     # This helper is the equivalent of UInt160.to_bytes().
-    bytes = RippleBaseDecoder.decode(value, 25) # = 20 bytes w/o header??
+    bytes = xrplBaseDecoder.decode(value, 25) # = 20 bytes w/o header??
     return bytes
 
 
 def serialize_varint(stream, val):
     """
-    In ripple-lib, this is ``serializedtypes.js:serialize_varint()``.
+    In xrpl-lib, this is ``serializedtypes.js:serialize_varint()``.
     Also described here:
-        https://ripple.com/wiki/Binary_Format#Variable_Length_Data_Encoding
+        https://xrpl.com/wiki/Binary_Format#Variable_Length_Data_Encoding
     """
     def rshift(val, n):
         # http://stackoverflow.com/a/5833119/15677
@@ -303,7 +303,7 @@ class AllStatic(type):
 
 
 class TypeSerializers:
-    # See ripple-lib:serializedtypes.js for the originals.
+    # See xrpl-lib:serializedtypes.js for the originals.
 
     __metaclass__ = AllStatic
     def byte_writer(num_bytes):
@@ -344,7 +344,7 @@ class TypeSerializers:
             TypeSerializers.STCurrency(stream, amount['currency'])
             # Write Issuer
             stream.write(
-                RippleBaseDecoder.decode(amount['issuer'], 25))
+                xrplBaseDecoder.decode(amount['issuer'], 25))
         else:
             # XRP - only support int notation for now, not floats.
             amount = int(amount)
@@ -365,7 +365,7 @@ class TypeSerializers:
             stream.write(amount_bytes)
 
     def STCurrency(stream, value):
-        # https://ripple.com/wiki/Currency_Format
+        # https://xrpl.com/wiki/Currency_Format
         value = value.upper()
         assert len(value) == 3 and value.isalnum()
 
@@ -376,7 +376,7 @@ class TypeSerializers:
             # by 20 empty bytes.
             # Note: As currencies get more complex, demurrage, we will need
             # to introduce a special class; for now we use a simple string.
-            # ripple-lib:currency.js will help to look at, and also
+            # xrpl-lib:currency.js will help to look at, and also
             # "Currency_format" format on the wiki.
             stream.write(bytearray(20))
 
@@ -398,7 +398,7 @@ class TypeSerializers:
 
             for entry in path:
                 # For now, the path sets we work with come from
-                # rippled directly, with the "type" already set.
+                # xrpld directly, with the "type" already set.
                 # Still, calculate it new in order to validate.
                 type = 0
                 if ('account' in entry):
@@ -446,7 +446,7 @@ def sort_fields(keys):
 
 
 def parse_non_native_amount(string):
-    """Like ``Amount.parse_human()`` in ripple-lib, will parse the
+    """Like ``Amount.parse_human()`` in xrpl-lib, will parse the
     given value into an integer and exponent offset.
     """
     amount = Decimal(string)
@@ -516,9 +516,9 @@ def decode_hex(hex_string):
         return hex_string.decode('hex')
 
 
-class RippleBaseDecoder(object):
-    """Decodes Ripple's base58 alphabet.
-    This is what ripple-lib does in ``base.js``.
+class xrplBaseDecoder(object):
+    """Decodes xrpl's base58 alphabet.
+    This is what xrpl-lib does in ``base.js``.
     """
 
     alphabet = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
@@ -535,7 +535,7 @@ class RippleBaseDecoder(object):
 
     @classmethod
     def decode_base(cls, encoded, pad_length=None):
-        """Decode a base encoded string with the Ripple alphabet."""
+        """Decode a base encoded string with the xrpl alphabet."""
         n = 0
         base = len(cls.alphabet)
         for char in encoded:
@@ -544,7 +544,7 @@ class RippleBaseDecoder(object):
 
     @classmethod
     def verify_checksum(cls, bytes):
-        """These ripple byte sequences have a checksum builtin.
+        """These xrpl byte sequences have a checksum builtin.
         """
         valid = bytes[-4:] == sha256(sha256(bytes[:-4]).digest()).digest()[:4]
         return valid
@@ -588,10 +588,10 @@ class RippleBaseDecoder(object):
 def call_encoder(func, *a, **kw):
     """Test/debug helper to make the stream-based encoder API
     more accessible.
-    Equivalent on the ripple-lib JS side:
+    Equivalent on the xrpl-lib JS side:
         function encoder(what, value) {
-            var SerializedObject = require('../src/js/ripple/serializedobject').SerializedObject;
-            s = require('../src/js/ripple/serializedtypes')
+            var SerializedObject = require('../src/js/xrpl/serializedobject').SerializedObject;
+            s = require('../src/js/xrpl/serializedtypes')
             b = new SerializedObject()
             s[what].serialize(b, value)
             return b.to_hex()
@@ -669,7 +669,7 @@ class Test:
     def test_transactions(self):
         """Test some full transactions.
         To get the reference output:
-            var SerializedObject = require('../src/js/ripple/serializedobject').SerializedObject;
+            var SerializedObject = require('../src/js/xrpl/serializedobject').SerializedObject;
             console.log(SerializedObject.from_json(tx_json).to_hex());
         """
         def s(obj):

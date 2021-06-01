@@ -10,8 +10,8 @@ from django.http import HttpResponseRedirect
 from push_notifications.models import APNSDevice, GCMDevice
 from django.utils.timezone import now
 from django.utils.html import format_html
-from ripple_wallet.ripple_utils import update_all_ripple_accounts,update_ripple_account
-from ripple_wallet.models import Currency
+from xrpl_wallet.xrpl_utils import update_all_xrpl_accounts,update_xrpl_account
+from xrpl_wallet.models import Currency
 from django.conf import settings
 from .withdrawal_transaction import decline_withdrawal_transaction,approve_withdrawal_transaction
 import threading
@@ -20,8 +20,8 @@ from import_export.admin import ExportActionModelAdmin,ExportMixin
 from import_export import fields, resources
 
 class WidthdrwalTransactionResouce(resources.ModelResource):
-    sender = fields.Field(column_name='user',attribute='user',widget=ForeignKeyWidget(RippleWallet,'user'))
-    # receiver = fields.Field(column_name='receiver',attribute='receiver',widget=ForeignKeyWidget(RippleWallet,'user'))
+    sender = fields.Field(column_name='user',attribute='user',widget=ForeignKeyWidget(xrplWallet,'user'))
+    # receiver = fields.Field(column_name='receiver',attribute='receiver',widget=ForeignKeyWidget(xrplWallet,'user'))
     related_transaction=fields.Field(column_name='related_transaction',attribute='related_transaction',widget=ForeignKeyWidget(STBTransaction,'reference_number'))
     refund_transaction=fields.Field(column_name='refund_transaction',attribute='refund_transaction',widget=ForeignKeyWidget(STBTransaction,'reference_number'))
     
@@ -91,7 +91,7 @@ class NetworkFeesAdmin(admin.ModelAdmin):
 
 
 class WithdrawApprovalAdmin(admin.ModelAdmin):
-    list_display = ['id','ripple_wallet','value_in_btc','value_in_cad',
+    list_display = ['id','xrpl_wallet','value_in_btc','value_in_cad',
     'activation_actions',
         ]
 

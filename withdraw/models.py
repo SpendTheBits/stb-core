@@ -12,7 +12,7 @@ import decimal
 from django.utils import timezone
 from datetime import timedelta,datetime
 import threading
-from ripple_wallet.models import STBTransaction,RippleWallet
+from xrpl_wallet.models import STBTransaction,xrplWallet
 from accounts.models import User
 
 from django.core.exceptions import ValidationError
@@ -43,7 +43,7 @@ class WithDrawalTransaction(BaseModel):
 
     ('WTC','WTC'),
     ]
-    sender = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,
+    sender = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,
             related_name='withdraw_transaction',null=True,blank=True)
     
     receiving_address = models.CharField(max_length=100)
@@ -96,7 +96,7 @@ class WithdrawApproval(BaseModel):
     is_approved = models.NullBooleanField(null=True,blank=True)
     approved_or_declined_time = models.DateTimeField(null=True,blank=True)
     request_time = models.DateTimeField(null=True,blank=True)
-    ripple_wallet = models.ForeignKey(RippleWallet,
+    xrpl_wallet = models.ForeignKey(xrplWallet,
                         on_delete=models.CASCADE,related_name='withdraw_requests',null=True,blank=True)
     
     approved_or_declined_by = models.ForeignKey(settings.AUTH_USER_MODEL,

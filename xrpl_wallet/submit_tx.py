@@ -1,4 +1,4 @@
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 import decimal
 import json
 import requests
@@ -9,12 +9,12 @@ from blockchain.wallet import Wallet
 
 from blockchain import util
 import time
-from ripple_wallet.ripple_utils import *
+from xrpl_wallet.xrpl_utils import *
 from django.conf import settings
 def submit_transaction(tx_blob):
     logger.info("came in  submit transction")
     #to submit a transaction, we sign it using sign_transaction and serialize it using serailize_object,
-    #and use submit method of ripple to submit the transaction
+    #and use submit method of xrpl to submit the transaction
 
 
     # result_after_sign = sign_transaction(tx_json,secret)
@@ -29,7 +29,7 @@ def submit_transaction(tx_blob):
             }
         ]
     }
-    response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+    response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
 
     json_response = response.json()
     logger.info("json response after submit transactini is",json_response)
@@ -72,7 +72,7 @@ def submit_transaction(tx_blob):
             ]
         }
 
-        response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+        response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
         json_response = response.json()
         status_code = response.status_code
         result = json_response['result']
@@ -157,7 +157,7 @@ def single_sign_and_submit_transaction(tx_json,secret):
             }
         ]
     }
-    response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+    response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
 
     json_response = response.json()
 

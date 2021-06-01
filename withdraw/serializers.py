@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 
 import decimal
 from accounts.models import UserProfile
-from ripple_wallet.funding_transactions import (get_wallet_activation_fee_in_btc,
+from xrpl_wallet.funding_transactions import (get_wallet_activation_fee_in_btc,
 get_wallet_activation_fee_in_currency,get_btc_to_currency,
 time_left_before_allowing_transaction,check_if_less_than_10_cad)
 
@@ -15,7 +15,7 @@ from withdraw.withdrawal_transaction import(time_left_before_allowing_transactio
 from withdraw.utils import (calculate_network_fees,check_if_more_than_withdrawal_limit,
 check_if_amount_more_than_spendable_balance)
 
-from ripple_wallet import bitgo_utils
+from xrpl_wallet import bitgo_utils
 class WithdrawBTCSerializer(serializers.Serializer):
     amount_in_btc = serializers.DecimalField(max_digits=18, decimal_places=8,coerce_to_string=False)
     receiving_btc_address = serializers.CharField(required=False)
@@ -44,7 +44,7 @@ class WithdrawBTCSerializer(serializers.Serializer):
 
         request = self.context.get('request')
         user = request.user
-        sender = RippleWallet.objects.get(user=user)          
+        sender = xrplWallet.objects.get(user=user)          
         balance_in_btc = sender.bitcoin_balance  
       
         #check 0
@@ -164,7 +164,7 @@ class GetWithdrawTransactionBreakupSerializer(serializers.Serializer):
         time_left_due_to_withdrawal = time_left_before_allowing_transaction_blocked_due_to_withrawal(user)
         logger.info("time_left in withdarwal breakup sertiailizer",time_left_due_to_withdrawal)
         logger.info("time_left in stb breakup sertiailizer",time_left)
-        sender = RippleWallet.objects.get(user=user)          
+        sender = xrplWallet.objects.get(user=user)          
         balance_in_btc = sender.bitcoin_balance 
 
         sender_bitcoin_address = BitcoinWalletAccount.objects.get(user=user).receiving_address.address

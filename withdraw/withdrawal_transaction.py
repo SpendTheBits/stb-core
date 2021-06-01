@@ -1,13 +1,13 @@
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 from withdraw.models import  * 
-from ripple_wallet.models import CentralWallet,STBTransaction 
-from ripple_wallet.stb_transactions import (create_transfer,stb_to_stb_transfer,
+from xrpl_wallet.models import CentralWallet,STBTransaction 
+from xrpl_wallet.stb_transactions import (create_transfer,stb_to_stb_transfer,
     update_reference_no_for_stb_transaction)
 from withdraw.utils import withdraw_btc_from_main_wallet,calculate_network_fees_for_fund,send_btc
 from accounts.utils import send_notification
 from django.conf import settings
-from ripple_wallet.admin_notifications import withdraw_transaction_request_admin_mail
-from ripple_wallet.bitgo_utils import update_bitcoin_balance
+from xrpl_wallet.admin_notifications import withdraw_transaction_request_admin_mail
+from xrpl_wallet.bitgo_utils import update_bitcoin_balance
 
 
 def create_withdraw_transaction_object(sender,receiver_address,bitcoin_amount,network_fees_in_btc):

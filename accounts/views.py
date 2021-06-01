@@ -8,18 +8,18 @@ from accounts.models import *
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly, AllowAny
 from django.conf import settings
-from ripple_wallet.create_ripple_wallet import create_ripple_wallet_and_bitcoin_addresss
+from xrpl_wallet.create_xrpl_wallet import create_xrpl_wallet_and_bitcoin_addresss
 from accounts.utils import (send_activation_mail,send_otp_to_user,get_tokens_for_user,get_all_country_details,test_email,
 get_currency_codes)
 import threading
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 from .utils import *
 from authy.api import AuthyApiClient
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_bytes,force_text
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
-from ripple_wallet.helper import get_btc_to_currency
-from ripple_wallet.funding_transactions import *
+from xrpl_wallet.helper import get_btc_to_currency
+from xrpl_wallet.funding_transactions import *
 from push_notifications.models import APNSDevice, GCMDevice
 authy_api = AuthyApiClient(settings.ACCOUNT_SECURITY_API_KEY)
 import datetime
@@ -31,8 +31,8 @@ from django.dispatch import receiver
 
 from twilio.rest import Client
 from rest_framework.parsers import FormParser, MultiPartParser
-from ripple_wallet.admin_notifications import pep_user_signed
-from ripple_wallet.models import AppConfiguration,Currency,ExchangeRate
+from xrpl_wallet.admin_notifications import pep_user_signed
+from xrpl_wallet.models import AppConfiguration,Currency,ExchangeRate
 from payid.models import PayId
 from requests.auth import HTTPBasicAuth 
 import xmltodict
@@ -166,7 +166,7 @@ class UserCreate(APIView):
                     pass
 
             logger.info("otp sent for create user")
-            thread1 = threading.Thread(target=create_ripple_wallet_and_bitcoin_addresss, args=(user,))
+            thread1 = threading.Thread(target=create_xrpl_wallet_and_bitcoin_addresss, args=(user,))
             thread2 = threading.Thread(target=send_activation_mail, args=(user,))
                      
             thread1.start()
@@ -775,13 +775,13 @@ def dv_callback(request):
 def delete_user_account(sender, instance: User, **kwarg):
     try:
         logger.info('user instance=',instance)
-        stb_wallet=RippleWallet.objects.get(user=instance)
+        stb_wallet=xrplWallet.objects.get(user=instance)
         logger.info('deleting wallet=',stb_wallet)
-        # Delete ripple account of deleting user
+        # Delete xrpl account of deleting user
         thread1 = threading.Thread(target=disable_account, args=(stb_wallet.account_id,stb_wallet.master_seed))
         thread1.start()
-        logger.info('ripple account deleted')
-        # check_delete_ripple_addrs=disable_account(stb_wallet.account_id,stb_wallet.master_seed)
+        logger.info('xrpl account deleted')
+        # check_delete_xrpl_addrs=disable_account(stb_wallet.account_id,stb_wallet.master_seed)
     except Exception as e:
         logger.info('error=',str(e))
         logger.info('something is wrong to delete user with xrpl')

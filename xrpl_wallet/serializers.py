@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 import decimal
 from accounts.models import UserProfile
-from ripple_wallet.funding_transactions import (get_wallet_activation_fee_in_btc,
+from xrpl_wallet.funding_transactions import (get_wallet_activation_fee_in_btc,
 get_wallet_activation_fee_in_currency,get_btc_to_currency,
 time_left_before_allowing_transaction,check_if_less_than_10_cad)
 
@@ -69,9 +69,9 @@ class SendToSTBWalletSerializer(serializers.Serializer):
 
 
         #checking 3    
-        sender = RippleWallet.objects.get(user=user)  
+        sender = xrplWallet.objects.get(user=user)  
         receiver_user = payid_obj.user_profile.user
-        receiver = RippleWallet.objects.get(user=receiver_user)
+        receiver = xrplWallet.objects.get(user=receiver_user)
 
         if receiver == sender:
             raise serializers.ValidationError("Can not send bitcoin to yourself")
@@ -209,9 +209,9 @@ class GetTransactionBreakupSerializer(serializers.Serializer):
         receiver_user = payid_obj.user_profile.user
 
         #checking 3
-        sender = RippleWallet.objects.get(user=user)  
+        sender = xrplWallet.objects.get(user=user)  
         
-        receiver = RippleWallet.objects.get(user=receiver_user)
+        receiver = xrplWallet.objects.get(user=receiver_user)
 
         if receiver == sender:
             raise serializers.ValidationError("Can not send bitcoin to yourself")

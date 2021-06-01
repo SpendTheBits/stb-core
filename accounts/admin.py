@@ -4,14 +4,14 @@ from accounts.models import *
 from import_export.admin import ExportActionModelAdmin
 from import_export import fields, resources
 from import_export.widgets import ForeignKeyWidget
-from ripple_wallet.models import RippleWallet
+from xrpl_wallet.models import xrplWallet
 from django.conf import settings
 from django.utils.html import format_html
 from django.conf.urls import url
 from django.urls import reverse
 from withdraw.models import *
 from accounts.mixin import ReadOnlyAdminMixin
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 import nested_admin
 
 
@@ -135,16 +135,16 @@ class BitcoinNetworkLedgerInline(nested_admin.NestedStackedInline):
 
 
 class STBWalletInline(nested_admin.NestedStackedInline):
-    model = RippleWallet
-    fields=['user','account_id','key_type','is_funded','master_seed','master_seed_hex','is_trust_line_set','is_master_seed_noted_down','ripple_balance','bitcoin_balance']
-    # readonly_fields=['account_id','key_type','is_funded','is_trust_line_set','is_master_seed_noted_down','ripple_balance','bitcoin_balance']
+    model = xrplWallet
+    fields=['user','account_id','key_type','is_funded','master_seed','master_seed_hex','is_trust_line_set','is_master_seed_noted_down','xrpl_balance','bitcoin_balance']
+    # readonly_fields=['account_id','key_type','is_funded','is_trust_line_set','is_master_seed_noted_down','xrpl_balance','bitcoin_balance']
     inlines=[WithDrawalTransactionInLine,STBTransactionInLine]
 
     def get_readonly_fields(self,request,obj=None):
         if request.user.is_superuser:
-            return ['account_id','key_type','is_funded','is_trust_line_set','is_master_seed_noted_down','ripple_balance','bitcoin_balance']
+            return ['account_id','key_type','is_funded','is_trust_line_set','is_master_seed_noted_down','xrpl_balance','bitcoin_balance']
         else:
-            return ['account_id','key_type','is_funded','is_trust_line_set','master_seed','master_seed_hex','is_master_seed_noted_down','ripple_balance','bitcoin_balance']
+            return ['account_id','key_type','is_funded','is_trust_line_set','master_seed','master_seed_hex','is_master_seed_noted_down','xrpl_balance','bitcoin_balance']
 
     # def has_module_permission(self,request,obj=None):
     #     return True

@@ -2,7 +2,7 @@ from rest_framework import exceptions,serializers
 from rest_framework.validators import UniqueValidator,UniqueTogetherValidator
 from accounts.models import *
 import django.contrib.auth.password_validation as validators
-from ripple_wallet.models import Currency
+from xrpl_wallet.models import Currency
 from django.contrib.auth import authenticate
 
 

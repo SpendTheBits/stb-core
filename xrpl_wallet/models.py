@@ -94,16 +94,16 @@ class AdminEmail(BaseModel):
     def __str__(self):
         return self.email
 
-class RippleWallet(BaseModel):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='ripple_wallet')
-    account_id = models.CharField('ripple address',max_length = 100)
+class xrplWallet(BaseModel):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='xrpl_wallet')
+    account_id = models.CharField('xrpl address',max_length = 100)
     key_type = models.CharField(max_length = 100,null=True,blank=True)
     public_key = models.CharField(max_length = 100,null=True,blank=True)
     public_key_hex = models.CharField(max_length = 100,null=True,blank=True)
     is_funded = models.BooleanField(default=False)
     is_trust_line_set = models.BooleanField(default=False) #Trust Line Set with us
     is_master_seed_noted_down = models.BooleanField(default=False) # Customer noted down master seed
-    ripple_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
+    xrpl_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
     bitcoin_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
 
 
@@ -139,8 +139,8 @@ class AppConfiguration(BaseModel):
     # TODO : Add ACTIVE to list VIEW ( REd color for inactive)
     name = models.CharField(max_length=40)
     active = models.BooleanField(default=True)
-    # issuer_wallet = models.OneToOneField(RippleWallet,on_delete = models.CASCADE,null=True)
-    minimum_ripple_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
+    # issuer_wallet = models.OneToOneField(xrplWallet,on_delete = models.CASCADE,null=True)
+    minimum_xrpl_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
     minimum_bitcoin_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
     confirmation_amount_in_btc = models.DecimalField('Max amount in BTC for 1 confirmation',default=0.00000000, 
         max_digits=18, decimal_places=8)
@@ -157,8 +157,8 @@ class AppConfiguration(BaseModel):
     email=models.CharField(max_length=30,null=True,blank=True)
     
     def clean(self, *args, **kwargs):
-        if self.minimum_ripple_balance <= 0:
-            raise ValidationError("minimum ripple balance cannot be negative or equal to zero")
+        if self.minimum_xrpl_balance <= 0:
+            raise ValidationError("minimum xrpl balance cannot be negative or equal to zero")
 
         if self.minimum_bitcoin_balance <= 0:
             raise ValidationError("minimum bitcoin balance cannot be negative or equal to zero")
@@ -247,7 +247,7 @@ class FundingTransaction(BaseModel):
 
 
 class CentralWallet(BaseModel):
-    wallet = models.OneToOneField(RippleWallet,on_delete = models.CASCADE,null=True)
+    wallet = models.OneToOneField(xrplWallet,on_delete = models.CASCADE,null=True)
     active = models.BooleanField(default=True)
     def save(self, *args, **kwargs):
         if(self.active):
@@ -279,8 +279,8 @@ class STBTransaction(BaseModel):
     ] #ADD DESCRIPTION OF WTC etc
     value = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
     value_in_cad = models.DecimalField(default=0.00000000, max_digits=38, decimal_places=8)
-    sender = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='stb_sender_transaction')
-    receiver = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='stb_receiver_transaction')
+    sender = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='stb_sender_transaction')
+    receiver = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='stb_receiver_transaction')
     wallet_activation_charge = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
     is_otp_verfied = models.BooleanField(default=False)
     is_validated = models.BooleanField(default=False)
@@ -399,7 +399,7 @@ class TransactionOtpAttempt(BaseModel):
 
 
 class Minimumbalance(BaseModel):
-    minimum_ripple_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
+    minimum_xrpl_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
     minimum_bitcoin_balance = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
     send_email_to = models.EmailField()
     active = models.BooleanField(default=True)
@@ -423,11 +423,11 @@ class AppNotification(BaseModel):
 
 
 class PendingTransactions(BaseModel):
-    receiver = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='pending_transaction')
+    receiver = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='pending_transaction')
     is_completed = models.BooleanField(default=False)
     transaction_id = models.IntegerField(null=True,blank=True)    
     tx_blob = models.CharField(max_length=1000,null=True,blank=True)
-    sender = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='sender_pending_transaction',null=True,blank=True)
+    sender = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='sender_pending_transaction',null=True,blank=True)
     sender_secret_key = models.CharField(max_length=100,null=True,blank=True)
     sequence_number = models.IntegerField(null=True,blank=True)
 
@@ -436,14 +436,14 @@ class PendingTransactions(BaseModel):
 
 
 class PendingTrustLines(BaseModel):
-    receiver = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='pending_trustlines')
+    receiver = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='pending_trustlines')
     device_key = models.CharField(max_length=1200)
     is_completed = models.BooleanField(default=False)
 
 
 
 class PendingFundTransactions(BaseModel):
-    receiver = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='pending_funding_transaction')
+    receiver = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='pending_funding_transaction')
     is_completed = models.BooleanField(default=False)
     transaction_id = models.IntegerField(null=True,blank=True,unique=True)
     value = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
@@ -453,7 +453,7 @@ class PendingFundTransactions(BaseModel):
 
 
 class CommissionWallet(BaseModel):
-    wallet = models.OneToOneField(RippleWallet,on_delete = models.CASCADE,null=True)
+    wallet = models.OneToOneField(xrplWallet,on_delete = models.CASCADE,null=True)
     active = models.BooleanField(default=True)
     def save(self, *args, **kwargs):
         if(self.active):
@@ -482,9 +482,9 @@ class XrpTransaction(BaseModel):
     ] 
     value_in_xrp = models.DecimalField(default=0.00000000, max_digits=18, decimal_places=8)
 
-    sender = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='xrp_sender_transaction',
+    sender = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='xrp_sender_transaction',
                     null=True,blank=True)
-    receiver = models.ForeignKey(RippleWallet,on_delete = models.CASCADE,related_name='xrp_receiver_transaction',
+    receiver = models.ForeignKey(xrplWallet,on_delete = models.CASCADE,related_name='xrp_receiver_transaction',
                     null=True,blank=True)
 
     is_validated = models.BooleanField(default=False)

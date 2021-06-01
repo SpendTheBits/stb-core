@@ -7,7 +7,7 @@ import decimal
 
 from django.utils import timezone
 from datetime import timedelta,datetime
-from ripple_wallet.models import BaseModel,AppConfiguration,Currency,ExchangeRate
+from xrpl_wallet.models import BaseModel,AppConfiguration,Currency,ExchangeRate
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""

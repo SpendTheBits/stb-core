@@ -1,5 +1,5 @@
-from ripple_wallet.bitgo_utils import get_maximum_spendable
-from ripple_wallet.models import (STBTransaction,AppConfiguration,
+from xrpl_wallet.bitgo_utils import get_maximum_spendable
+from xrpl_wallet.models import (STBTransaction,AppConfiguration,
         BitcoinWalletAccount,CentralWallet,Currency)
 from withdraw.models import  * 
 
@@ -12,7 +12,7 @@ from django.utils import timezone
 import datetime
 from datetime import timedelta
 from django.conf import settings
-from ripple_wallet import bitgo_utils
+from xrpl_wallet import bitgo_utils
 from push_notifications.models import APNSDevice, GCMDevice
 import string
 import random

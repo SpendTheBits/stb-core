@@ -1,4 +1,4 @@
-from ripple_wallet.models import *
+from xrpl_wallet.models import *
 import decimal
 import json
 import requests
@@ -19,7 +19,7 @@ from django.conf import settings
 
 
 
-def get_xrp_balance_for_ripple_wallet(account_id):
+def get_xrp_balance_for_xrpl_wallet(account_id):
  #this uses account_info method to calculate xrp balance   
     to_send = {
     "method": "account_info",
@@ -32,15 +32,15 @@ def get_xrp_balance_for_ripple_wallet(account_id):
         }
             ]
                 }
-    response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+    response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
     json_response = response.json()
 
     logger.info("json_response is ",json_response)
 
-    ripple_balance = json_response['result']['account_data']['Balance']
-    logger.info("type of balance @70 is",type(ripple_balance))
-    ripple_balance = int(ripple_balance)
-    balance_in_xrp = ripple_balance/1000000
+    xrpl_balance = json_response['result']['account_data']['Balance']
+    logger.info("type of balance @70 is",type(xrpl_balance))
+    xrpl_balance = int(xrpl_balance)
+    balance_in_xrp = xrpl_balance/1000000
     balance_in_xrp = decimal.Decimal(balance_in_xrp)
     logger.info("balance_in_xrp in@74",balance_in_xrp)
     return balance_in_xrp
@@ -53,7 +53,7 @@ def get_btc_from_xrp(xrp_amt):
     ask = decimal.Decimal(str(ask))
     return (ask)*xrp_amt
 
-def get_btc_balance_for_ripple_wallet(account_id):
+def get_btc_balance_for_xrpl_wallet(account_id):
     #this uses account_lines method to calculate btc balance  
     to_send = {
         "method": "account_lines",
@@ -63,7 +63,7 @@ def get_btc_balance_for_ripple_wallet(account_id):
             }
         ]
     }
-    response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+    response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
     json_response = response.json()
 
     bitcoin_balance = 0
@@ -96,35 +96,35 @@ def get_btc_balance_for_ripple_wallet(account_id):
 
 
 
-def update_all_ripple_accounts():
-    #update both xrp and btc balance in ripplewallet(funded) for all users
-    logger.info("update_all_ripple_accounts starts")
+def update_all_xrpl_accounts():
+    #update both xrp and btc balance in xrplwallet(funded) for all users
+    logger.info("update_all_xrpl_accounts starts")
 
-    ripple_wallet_list = RippleWallet.objects.filter(is_funded=True)
-    logger.info("no of funded ripple wallet is",ripple_wallet_list.count())
-    for ripple_wallet in ripple_wallet_list:
-        account_id = ripple_wallet.account_id
-        logger.info("account_id in update_all_ripple_accounts is",account_id)
-        balance_in_xrp = get_xrp_balance_for_ripple_wallet(account_id)
-        bitcoin_balance = get_btc_balance_for_ripple_wallet(account_id)
+    xrpl_wallet_list = xrplWallet.objects.filter(is_funded=True)
+    logger.info("no of funded xrpl wallet is",xrpl_wallet_list.count())
+    for xrpl_wallet in xrpl_wallet_list:
+        account_id = xrpl_wallet.account_id
+        logger.info("account_id in update_all_xrpl_accounts is",account_id)
+        balance_in_xrp = get_xrp_balance_for_xrpl_wallet(account_id)
+        bitcoin_balance = get_btc_balance_for_xrpl_wallet(account_id)
 
-        ripple_wallet.ripple_balance = balance_in_xrp
-        ripple_wallet.bitcoin_balance = bitcoin_balance
-        ripple_wallet.save()
-    logger.info("update_all_ripple_accounts ending")
+        xrpl_wallet.xrpl_balance = balance_in_xrp
+        xrpl_wallet.bitcoin_balance = bitcoin_balance
+        xrpl_wallet.save()
+    logger.info("update_all_xrpl_accounts ending")
     return
 
 
 
-def update_ripple_account(ripple_address):
-    logger.info("riplle adress in update riiple account is",ripple_address)
-    ripple_wallet = RippleWallet.objects.get(account_id = ripple_address)
-    balance_in_xrp = get_xrp_balance_for_ripple_wallet(ripple_address)
-    bitcoin_balance = get_btc_balance_for_ripple_wallet(ripple_address)
+def update_xrpl_account(xrpl_address):
+    logger.info("riplle adress in update riiple account is",xrpl_address)
+    xrpl_wallet = xrplWallet.objects.get(account_id = xrpl_address)
+    balance_in_xrp = get_xrp_balance_for_xrpl_wallet(xrpl_address)
+    bitcoin_balance = get_btc_balance_for_xrpl_wallet(xrpl_address)
 
-    ripple_wallet.ripple_balance = balance_in_xrp
-    ripple_wallet.bitcoin_balance = bitcoin_balance
-    ripple_wallet.save()
+    xrpl_wallet.xrpl_balance = balance_in_xrp
+    xrpl_wallet.bitcoin_balance = bitcoin_balance
+    xrpl_wallet.save()
     return
 
 
@@ -137,7 +137,7 @@ def complete_ledgers():
         {}
     ]
         }
-    response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+    response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
 
     json_response = response.json()
 
@@ -171,7 +171,7 @@ def get_lastledgersequence():
     ]
         }
  
-    response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+    response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
     json_response = response.json()
 
 
@@ -194,8 +194,8 @@ def get_sequence_number(account):
         ]
     }
 
-    logger.info("ripple submit server is",settings.RIPPLE_SUBMIT_SERVER)
-    response = requests.post(settings.RIPPLE_SUBMIT_SERVER, json=to_send)
+    logger.info("xrpl submit server is",settings.xrpl_SUBMIT_SERVER)
+    response = requests.post(settings.xrpl_SUBMIT_SERVER, json=to_send)
     json_response = response.json()
 
 
